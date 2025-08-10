@@ -1,31 +1,22 @@
 import re
-from flask import Flask, render_template, request, redirect, url_for
 import os
+import time
+from flask import Flask, render_template, request, redirect
 from paddleocr import PaddleOCR
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.chrome.service import Service
-import time
-from flask import request
-from fastapi import Request
-from paddleocr import PaddleOCR
-from selenium import webdriver
-from selenium.webdriver.common.by import By
-from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.chrome.service import Service
-from webdriver_manager.chrome import ChromeDriverManager
-from selenium.webdriver.chrome.options import Options
-from webdriver_manager.chrome import ChromeDriverManager
-import time
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from webdriver_manager.chrome import ChromeDriverManager
 
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = 'uploads'
 app.config['ALLOWED_EXTENSIONS'] = {'jpg', 'jpeg', 'png'}
 
+# ---------- Utility Functions ----------
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in app.config['ALLOWED_EXTENSIONS']
 
@@ -95,12 +86,12 @@ def extract_details_from_image(img_path):
 
 def get_gst_details(CIN):
     chrome_options = Options()
-    chrome_options.add_argument("--headless")  # Run in headless mode
+    chrome_options.add_argument("--headless")
     chrome_options.add_argument("--no-sandbox")
     chrome_options.add_argument("--disable-dev-shm-usage")
 
     driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=chrome_options)
-    url = "https://www.zaubacorp.com/company/ALEP-MANAGEMENT-LLP/AAS-9086"  # Replace with the actual URL
+    url = "https://www.zaubacorp.com/company/ALEP-MANAGEMENT-LLP/AAS-9086"
     driver.get(url)
 
     input_field = driver.find_element(By.ID, 'searchid')
@@ -108,9 +99,8 @@ def get_gst_details(CIN):
     input_field.send_keys(Keys.RETURN)
 
     time.sleep(5)
-    
+
     try:
-        # Wait for the company name and date of incorporation elements to load
         WebDriverWait(driver, 10).until(
             EC.presence_of_element_located((By.XPATH, "//td[p[text()='Company Name']]/following-sibling::td/p"))
         )
@@ -120,12 +110,14 @@ def get_gst_details(CIN):
         print(f"Error extracting details: {e}")
         driver.quit()
         return None
+
     driver.quit()
     return {
         'Company Name': company_name_2,
         'Date of Incorporation': date_of_incorporation_2
     }
 
+# ---------- Routes ----------
 @app.route('/', methods=['GET', 'POST'])
 def upload_file():
     if request.method == 'POST':
@@ -138,6 +130,7 @@ def upload_file():
             filename = os.path.join(app.config['UPLOAD_FOLDER'], file.filename)
             file.save(filename)
             company_name, date_of_incorporation, llpin, pan, digital_signature_name = extract_details_from_image(filename)
+            gst_details = None
             if llpin != "LLPIN / CIN not found":
                 gst_details = get_gst_details(llpin)
                 if gst_details:
@@ -149,22 +142,23 @@ def upload_file():
             else:
                 validation_status = "CIN not found in the OCR process."
 
-            return render_template('result2.html', 
-                                   company_name=company_name,
-                                   date_of_incorporation=date_of_incorporation,
-                                   llpin=llpin,
-                                   pan=pan,
-                                   digital_signature_name=digital_signature_name,
-                                   validation_status=validation_status,
-                                   gst_details=gst_details if gst_details else None)
+            return render_template(
+                'result2.html', 
+                company_name=company_name,
+                date_of_incorporation=date_of_incorporation,
+                llpin=llpin,
+                pan=pan,
+                digital_signature_name=digital_signature_name,
+                validation_status=validation_status,
+                gst_details=gst_details if gst_details else None
+            )
     return render_template('upload2.html')
 
 @app.route('/next_step')
 def next_step():
-    # Add logic for the next step here
     return "Next step functionality not implemented yet."
 
 if __name__ == '__main__':
     if not os.path.exists(app.config['UPLOAD_FOLDER']):
         os.makedirs(app.config['UPLOAD_FOLDER'])
-    app.run(port=5001, debug=True)  # Run this application on port 5001
+    app.run(port=5001, debug=True)
