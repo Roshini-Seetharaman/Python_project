@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Upload GST Certificate</title>
+      </head>
+      <style>
+        * {
+          margin: 0;
+          padding: 0;
+          box-sizing: border-box;
+          font-family: Arial, sans-serif;
+        }
+    
+        body {
+          background-color: #f4f4f4;
+          padding: 20px;
+        }
+    
+        h1 {
+          font-size: 24px;
+          color: white; /* Text color for contrast */
+          background-color: #002D73; /* Dark blue background color */
+          padding: 10px;
+          border-radius: 8px;
+          margin-bottom: 20px;
+        }
+    
+        form {
+          background-color: white;
+          padding: 30px;
+          border-radius: 8px;
+          box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+          max-width: 400px;
+          width: 100%;
+        }
+    
+        input[type="file"] {
+          border: 2px dashed #ccc;
+          padding: 20px;
+          border-radius: 8px;
+          cursor: pointer;
+          width: 100%;
+          text-align: center;
+          color: #666;
+          font-size: 16px;
+          margin-bottom: 20px;
+          transition: border-color 0.3s ease-in-out;
+        }
+    
+        input[type="file"]:hover {
+          border-color: #002D73;
+        }
+    
+        input[type="submit"] {
+          background-color: #002D73;
+          color: white;
+          border: none;
+          padding: 10px 20px;
+          border-radius: 8px;
+          cursor: pointer;
+          font-size: 16px;
+          transition: background-color 0.3s ease-in-out;
+        }
+    
+        input[type="submit"]:hover {
+          background-color: #0056b3;
+        }
+    
+        @media (max-width: 600px) {
+          form {
+            padding: 20px;
+          }
+          
+          h1 {
+            font-size: 20px;
+          }
+        }
+      </style>
+<body>
+    <h1>Upload GST Certificate</h1>
+    <form action="/upload/" method="post" enctype="multipart/form-data">
+        <input type="file" name="file" accept=".png,.jpg,.jpeg">
+        <input type="submit" value="Upload" >
+    </form>
+</body>
+</html>
