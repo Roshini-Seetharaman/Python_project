@@ -1,0 +1,5 @@
+Flask
+paddleocr
+selenium
+webdriver-manager
+Pillow
