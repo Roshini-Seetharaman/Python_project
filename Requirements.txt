@@ -1,5 +1,13 @@
+
+---
+
+**requirements.txt**  
+```txt
 Flask
 paddleocr
 selenium
 webdriver-manager
 Pillow
+requests
+pandas
+opencv-python
